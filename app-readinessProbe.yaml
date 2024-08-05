@@ -1,0 +1,48 @@
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-readinessprob
+spec:
+  containers:
+  - name: demo
+    image: gcr.io/k8s-k3s/demo:v2.0.0
+    ports:
+    - containerPort: 8000
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 8000
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8000
+      initialDelaySeconds: 5
+      periodSeconds: 10
+  - name: demo-volley
+    image: k8s-gcr-demo/k8s-spring-petclinic:0.0.1-SNAPSHOT
+    ports:
+    - containerPort: 8081
+    env:
+    - name: K8S_SERVICE_DOMAIN
+      value: "localhost"
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: spec.nodeName
+    - name: K8S_NODE_NAME
+      value: "docker-desktop"
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: spec.nodeName
+    - name: K8S_SCHEDULER_NAME
+      value: "kubernetes"
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: spec.nodeName
+  restartPolicy: Always
+

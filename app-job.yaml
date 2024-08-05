@@ -1,0 +1,26 @@
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: app-job-rsync
+spec:
+  template:
+    metadata:
+      name: app-job-rsync
+    spec:
+      containers:
+      - name: rsync-container
+        image: google/cloud-sdk:275.0.0-alpine
+        command: ["/bin/sh", "-c"]
+        args: ["sutil"]
+        volumeMounts:
+        - name: input-pd
+          mountPath: /data/input
+      restartPolicy: Never
+      backoffLimit: 0
+      volumes:
+      - name: input-pd
+        gcePersistentDisk:
+          pdName: your-pd-name
+          fsType: ext4
+
